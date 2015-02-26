@@ -1,0 +1,7 @@
+dist
+o0
+.cabal-sandbox/
+cabal.sandbox.config
+**/*.gui~
+\#*.gui\#
+Main
