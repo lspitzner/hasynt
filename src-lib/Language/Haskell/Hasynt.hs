@@ -14,13 +14,26 @@ import qualified Language.Haskell.Exts.Parser as P
 import qualified Language.Haskell.Exts.Pretty as PP
 import Data.Data
 import Control.Applicative ( (<$>) )
+import Language.Haskell.Exts.Extension ( Language(Haskell2010)
+                                       , Extension(EnableExtension)
+                                       , KnownExtension(ExplicitForAll)
+                                       )
 
 
 
 parse :: String -> Either (Int, Int, String) Module
-parse s = case P.parse s of
+parse s = case P.parseWithMode parseMode s of
   P.ParseOk m       -> Right m
   P.ParseFailed (SrcLoc _ l c) s -> Left (l, c, s)
+ where
+  parseMode = P.ParseMode
+    ""
+    Haskell2010
+    [EnableExtension ExplicitForAll]
+    False
+    True
+    Nothing
+
 
 prettyPrint :: Bool -> Module -> String
 prettyPrint braces = PP.prettyPrintStyleMode
