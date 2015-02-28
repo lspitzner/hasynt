@@ -21,7 +21,7 @@ parse s = case P.parse s of
 
 prettyPrint :: Module -> String
 prettyPrint = PP.prettyPrintStyleMode
-  (PP.Style PP.PageMode 70 1.5)
+  (PP.Style PP.PageMode 70 0.5)
   (PP.PPHsMode 2 2 2 2 4 2 2 False PP.PPOffsideRule False)
 
 transformInfixOperators :: Module -> Module
