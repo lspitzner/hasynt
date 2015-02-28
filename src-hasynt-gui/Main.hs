@@ -22,7 +22,9 @@ main = do
   textviewInput  <- builderGetObject builder castToTextView "textviewInput"
   textviewOutput <- builderGetObject builder castToTextView "textviewOutput"
   entryStatus    <- builderGetObject builder castToEntry    "entryStatus"
-  checkbuttonBraces <- builderGetObject builder castToCheckButton "checkbuttonBraces"
+  checkbuttonTypeParen  <- builderGetObject builder castToCheckButton "checkbuttonTypeParen"
+  checkbuttonValueParen <- builderGetObject builder castToCheckButton "checkbuttonValueParen"
+  checkbuttonBraces     <- builderGetObject builder castToCheckButton "checkbuttonBraces"
 
   _ <- on buttonRefresh buttonActivated $ do
     inputBuffer <- textViewGetBuffer textviewInput
@@ -38,8 +40,12 @@ main = do
         entrySetText entryStatus (show l ++ " " ++ err)
         return ()
       Right m -> do
+        typeParen <- toggleButtonGetActive checkbuttonTypeParen
+        _valueParen <- toggleButtonGetActive checkbuttonValueParen
         braces <- toggleButtonGetActive checkbuttonBraces
-        let output = prettyPrint braces $ addParens $ m
+        let output = prettyPrint braces
+                   $ (if typeParen then addParensType else id)
+                   $ m
         textBufferSetText outputBuffer output
         entrySetText entryStatus "success"
   _ <- on window objectDestroy $ do
