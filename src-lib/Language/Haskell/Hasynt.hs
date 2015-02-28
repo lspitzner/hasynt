@@ -21,6 +21,7 @@ import Language.Haskell.Exts.Extension ( Language(Haskell2010)
                                        , Extension(EnableExtension)
                                        , KnownExtension(ExplicitForAll)
                                        )
+import Language.Haskell.Exts.Fixity    ( baseFixities )
 
 
 
@@ -35,7 +36,7 @@ parse s = case P.parseWithMode parseMode s of
     [EnableExtension ExplicitForAll]
     False
     True
-    Nothing
+    (Just baseFixities)
 
 
 prettyPrint :: Bool -> Module -> String
@@ -137,4 +138,6 @@ addParensValue = dataMorph (valueTransform False)
 
 -- why this function is not in Data.Data, i cannot tell..
 dataMorph :: (Data d, Typeable a) => (a -> a) -> d -> d
-dataMorph f o = case cast o >>= cast . f of Nothing -> gmapT (dataMorph f) o; Just x  -> x
+dataMorph f o = case cast o >>= cast . f of
+  Nothing -> gmapT (dataMorph f) o;
+  Just x  -> x
