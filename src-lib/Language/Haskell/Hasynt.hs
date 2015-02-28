@@ -20,7 +20,9 @@ parse s = case P.parse s of
   P.ParseFailed l s -> Left $ show l ++ " " ++ s
 
 prettyPrint :: Module -> String
-prettyPrint = PP.prettyPrint
+prettyPrint = PP.prettyPrintStyleMode
+  (PP.Style PP.PageMode 70 1.5)
+  (PP.PPHsMode 2 2 2 2 4 2 2 False PP.PPOffsideRule False)
 
 transformInfixOperators :: Module -> Module
 transformInfixOperators = undefined
