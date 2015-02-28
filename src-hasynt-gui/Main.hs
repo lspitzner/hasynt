@@ -21,6 +21,7 @@ main = do
   buttonRefresh  <- builderGetObject builder castToButton "buttonRefresh"
   textviewInput  <- builderGetObject builder castToTextView "textviewInput"
   textviewOutput <- builderGetObject builder castToTextView "textviewOutput"
+  entryStatus    <- builderGetObject builder castToEntry    "entryStatus"
   _ <- on buttonRefresh buttonActivated $ do
     inputBuffer <- textViewGetBuffer textviewInput
     outputBuffer <- textViewGetBuffer textviewOutput
@@ -29,11 +30,15 @@ main = do
     input <- textBufferGetText inputBuffer s e False
     let parsed = parse input
     case parsed of
-      Left _e -> do
+      Left (l, c, err) -> do
         textBufferSetText outputBuffer ""
+        _iter <- textBufferGetIterAtLineOffset inputBuffer l c
+        entrySetText entryStatus (show l ++ " " ++ err)
+        return ()
       Right m -> do
         let output = prettyPrint $ addParens $ m
         textBufferSetText outputBuffer output
+        entrySetText entryStatus "success"
   _ <- on window objectDestroy $ do
     -- widgetDestroy window
     mainQuit

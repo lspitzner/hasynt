@@ -9,15 +9,16 @@ where
 
 
 import Language.Haskell.Exts.Syntax ( Module )
+import Language.Haskell.Exts.SrcLoc ( SrcLoc(SrcLoc) )
 import qualified Language.Haskell.Exts.Parser as P
 import qualified Language.Haskell.Exts.Pretty as PP
 
 
 
-parse :: String -> Either String Module
+parse :: String -> Either (Int, Int, String) Module
 parse s = case P.parse s of
   P.ParseOk m       -> Right m
-  P.ParseFailed l s -> Left $ show l ++ " " ++ s
+  P.ParseFailed (SrcLoc _ l c) s -> Left (l, c, s)
 
 prettyPrint :: Module -> String
 prettyPrint = PP.prettyPrintStyleMode
