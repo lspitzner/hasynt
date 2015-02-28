@@ -41,10 +41,11 @@ main = do
         return ()
       Right m -> do
         typeParen <- toggleButtonGetActive checkbuttonTypeParen
-        _valueParen <- toggleButtonGetActive checkbuttonValueParen
+        valueParen <- toggleButtonGetActive checkbuttonValueParen
         braces <- toggleButtonGetActive checkbuttonBraces
         let output = prettyPrint braces
                    $ (if typeParen then addParensType else id)
+                   $ (if valueParen then addParensValue else id)
                    $ m
         textBufferSetText outputBuffer output
         entrySetText entryStatus "success"
