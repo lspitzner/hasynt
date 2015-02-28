@@ -9,17 +9,21 @@ where
 
 
 import Language.Haskell.Exts.Syntax ( Module )
+import qualified Language.Haskell.Exts.Parser as P
+import qualified Language.Haskell.Exts.Pretty as PP
 
 
 
-parse :: String -> Module
-parse = undefined
+parse :: String -> Either String Module
+parse s = case P.parse s of
+  P.ParseOk m       -> Right m
+  P.ParseFailed l s -> Left $ show l ++ " " ++ s
 
 prettyPrint :: Module -> String
-prettyPrint = undefined
+prettyPrint = PP.prettyPrint
 
 transformInfixOperators :: Module -> Module
 transformInfixOperators = undefined
 
 addParens :: Module -> Module
-addParens = undefined
+addParens = id

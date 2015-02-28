@@ -22,14 +22,18 @@ main = do
   textviewInput  <- builderGetObject builder castToTextView "textviewInput"
   textviewOutput <- builderGetObject builder castToTextView "textviewOutput"
   _ <- on buttonRefresh buttonActivated $ do
-    putStrLn "pressed!"
     inputBuffer <- textViewGetBuffer textviewInput
     outputBuffer <- textViewGetBuffer textviewOutput
     s <- textBufferGetStartIter inputBuffer
     e <- textBufferGetEndIter   inputBuffer
     input <- textBufferGetText inputBuffer s e False
-    let output = prettyPrint $ addParens $ parse input
-    textBufferSetText outputBuffer output
+    let parsed = parse input
+    case parsed of
+      Left _e -> do
+        textBufferSetText outputBuffer ""
+      Right m -> do
+        let output = prettyPrint $ addParens $ m
+        textBufferSetText outputBuffer output
   _ <- on window objectDestroy $ do
     -- widgetDestroy window
     mainQuit
