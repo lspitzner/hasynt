@@ -41,5 +41,8 @@ executable hasynt-gui
   -- other-extensions:    
   hs-source-dirs:      src-hasynt-gui
   main-is:             Main.hs
+  ghc-options:         -Wall -threaded
   build-depends:       base >=4.7 && <4.8,
-                       hasynt
+                       hasynt,
+                       gtk3 >=0.13,
+                       text

@@ -1,5 +1,8 @@
 module Language.Haskell.Hasynt
-  (
+  ( parse
+  , prettyPrint
+  , transformInfixOperators
+  , addParens
   )
 where
 
