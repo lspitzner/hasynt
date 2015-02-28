@@ -20,10 +20,13 @@ parse s = case P.parse s of
   P.ParseOk m       -> Right m
   P.ParseFailed (SrcLoc _ l c) s -> Left (l, c, s)
 
-prettyPrint :: Module -> String
-prettyPrint = PP.prettyPrintStyleMode
+prettyPrint :: Bool -> Module -> String
+prettyPrint braces = PP.prettyPrintStyleMode
   (PP.Style PP.PageMode 70 0.5)
-  (PP.PPHsMode 2 2 2 2 4 2 2 False PP.PPOffsideRule False)
+  (PP.PPHsMode 2 2 2 2 4 2 2
+               False
+               (if braces then PP.PPSemiColon else PP.PPOffsideRule)
+               False)
 
 transformInfixOperators :: Module -> Module
 transformInfixOperators = undefined
