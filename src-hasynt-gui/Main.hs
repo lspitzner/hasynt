@@ -62,8 +62,10 @@ main = do
       iNow <- readMVar mVarUpdate
       when (i==iNow) $ postGUIAsync updateOutput
 
-  _ <- on buttonRefresh buttonActivated $ do
-    updateOutput
+  _ <- on buttonRefresh buttonActivated updateOutput
+  _ <- on checkbuttonTypeParen  toggled updateOutput
+  _ <- on checkbuttonValueParen toggled updateOutput
+  _ <- on checkbuttonBraces     toggled updateOutput
   _ <- on inputBuffer bufferChanged $ do
     s <- modifyMVar mVarUpdate (\s -> return (s+1, s+1))
     _ <- forkIO $ updateThread s
