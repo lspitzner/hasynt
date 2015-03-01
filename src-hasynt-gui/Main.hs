@@ -10,6 +10,8 @@ import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Builder
 import Language.Haskell.Hasynt
 import Control.Concurrent.MVar
+import Control.Concurrent ( forkIO, threadDelay )
+import Control.Monad ( when )
 
 
 
@@ -38,9 +40,9 @@ main = do
       input <- textBufferGetText inputBuffer s e False
       let parsed = parse input
       case parsed of
-        Left (l, c, err) -> do
+        Left (l, _c, err) -> do
           textBufferSetText outputBuffer ""
-          _iter <- textBufferGetIterAtLineOffset inputBuffer l c
+          -- _iter <- textBufferGetIterAtLineOffset inputBuffer l c
           entrySetText entryStatus (show l ++ " " ++ err)
           return ()
         Right m -> do
@@ -54,15 +56,18 @@ main = do
           textBufferSetText outputBuffer output
           entrySetText entryStatus "success"
   let
-    updateThread :: IO ()
-    updateThread = do
-      return () -- TODO
+    updateThread :: Int -> IO ()
+    updateThread i = do
+      threadDelay 1000000
+      iNow <- readMVar mVarUpdate
+      when (i==iNow) $ postGUIAsync updateOutput
 
   _ <- on buttonRefresh buttonActivated $ do
     updateOutput
   _ <- on inputBuffer bufferChanged $ do
-    modifyMVar_ mVarUpdate (return . (+1))
-    updateThread
+    s <- modifyMVar mVarUpdate (\s -> return (s+1, s+1))
+    _ <- forkIO $ updateThread s
+    return ()
     -- putStrLn $ "changed"
   _ <- on window objectDestroy $ do
     -- widgetDestroy window
