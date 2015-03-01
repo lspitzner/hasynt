@@ -2,4 +2,4 @@ module Main where
 
 
 
-main = return ()
+main = putStrLn "not implemented"
