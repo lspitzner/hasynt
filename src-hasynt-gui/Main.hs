@@ -35,6 +35,8 @@ main = do
   inputBuffer <- textViewGetBuffer textviewInput
   outputBuffer <- textViewGetBuffer textviewOutput
   mVarUpdate <- newMVar (0 :: Int)
+  radioPPSimple1     <- builderGetObject builder castToRadioButton "radiobuttonPPS1"
+  radioPPSimple2     <- builderGetObject builder castToRadioButton "radiobuttonPPS2"
   radioPPChrisDone   <- builderGetObject builder castToRadioButton "radiobuttonPPChrisDone"
   radioPPJohanTibell <- builderGetObject builder castToRadioButton "radiobuttonPPJohanTibell"
   radioPPFundamental <- builderGetObject builder castToRadioButton "radiobuttonPPFundamental"
@@ -73,16 +75,20 @@ main = do
           let transformed = (if typeParen then addParensType else id)
                           $ (if valueParen then addParensValue else id)
                           $ m
+          s1 <- toggleButtonGetActive radioPPSimple1
+          s2 <- toggleButtonGetActive radioPPSimple2
           p1 <- toggleButtonGetActive radioPPChrisDone
           p2 <- toggleButtonGetActive radioPPJohanTibell
           p3 <- toggleButtonGetActive radioPPFundamental
           p4 <- toggleButtonGetActive radioPPGibiansky
           let
-            style = if p1 then H.chrisDone
-               else if p2 then H.johanTibell
-               else if p3 then H.fundamental
-               else if p4 then H.gibiansky
-                          else H.fundamental
+            style = if s1 then Left False
+               else if s2 then Left True
+               else if p1 then Right H.chrisDone
+               else if p2 then Right H.johanTibell
+               else if p3 then Right H.fundamental
+               else if p4 then Right H.gibiansky
+                          else Left False
           let output = prettyPrint style transformed
           -- _ $ pretty transformed
           textBufferSetText outputBuffer output
@@ -98,6 +104,8 @@ main = do
   _ <- on checkbuttonTypeParen  toggled updateOutput
   _ <- on checkbuttonValueParen toggled updateOutput
   _ <- on checkbuttonBraces     toggled updateOutput
+  _ <- on radioPPSimple1        toggled updateOutput
+  _ <- on radioPPSimple1        toggled updateOutput
   _ <- on radioPPChrisDone      toggled updateOutput
   _ <- on radioPPJohanTibell    toggled updateOutput
   _ <- on radioPPFundamental    toggled updateOutput

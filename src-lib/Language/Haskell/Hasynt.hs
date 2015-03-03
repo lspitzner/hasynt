@@ -32,6 +32,7 @@ import qualified HIndent as H
 import Data.Text.Internal.Builder ( toLazyText )
 import Data.Text.Internal.Lazy    ( foldrChunks )
 import qualified Data.Text.Lazy as DTL
+import Language.Haskell.Exts.Annotated.Simplify ( sModule )
 
 
 
@@ -52,14 +53,16 @@ parseMode = Annotated.ParseMode
   (Just baseFixities)
 
 
-prettyPrint :: H.Style -> Module NodeInfo -> String
-prettyPrint style ast = DTL.unpack $ toLazyText $ H.prettyPrint parseMode style $ pretty ast
--- PP.prettyPrintStyleMode
---   (PP.Style PP.PageMode 70 0.5)
---   (PP.PPHsMode 2 2 2 2 4 2 2
---                False
---                (if braces then PP.PPSemiColon else PP.PPOffsideRule)
---                False)
+prettyPrint :: Either Bool H.Style -> Module NodeInfo -> String
+prettyPrint (Right style) ast = DTL.unpack $ toLazyText $ H.prettyPrint parseMode style $ pretty ast
+prettyPrint (Left braces) ast =
+  PP.prettyPrintStyleMode
+    (PP.Style PP.PageMode 70 0.5)
+    (PP.PPHsMode 2 2 2 2 4 2 2
+                 False
+                 (if braces then PP.PPSemiColon else PP.PPOffsideRule)
+                 False)
+    (sModule $ nodeInfoSpan <$> ast)
 
 transformInfixOperators :: Module NodeInfo -> Module NodeInfo
 transformInfixOperators = undefined
