@@ -39,13 +39,26 @@ main = do
       e <- textBufferGetEndIter   inputBuffer
       input <- textBufferGetText inputBuffer s e False
       let parsed = parse input
+      let
+        removeOldMark = do
+          oldMarkM <- textBufferGetMark inputBuffer (T.pack "error")
+          case oldMarkM of
+            Nothing      -> return ()
+            Just oldMark -> do
+              textMarkSetVisible oldMark False
+              textBufferDeleteMark inputBuffer oldMark
+              removeOldMark
       case parsed of
-        Left (l, _c, err) -> do
+        Left (l, c, err) -> do
           textBufferSetText outputBuffer ""
-          -- _iter <- textBufferGetIterAtLineOffset inputBuffer l c
+          removeOldMark
+          iter <- textBufferGetIterAtLineOffset inputBuffer l (c-1)
+          mark <- textBufferCreateMark inputBuffer (Just $ T.pack $ "error") iter True
+          textMarkSetVisible mark True
           entrySetText entryStatus (show l ++ " " ++ err)
           return ()
         Right m -> do
+          removeOldMark
           typeParen <- toggleButtonGetActive checkbuttonTypeParen
           valueParen <- toggleButtonGetActive checkbuttonValueParen
           braces <- toggleButtonGetActive checkbuttonBraces
