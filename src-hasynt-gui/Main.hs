@@ -6,12 +6,16 @@ module Main where
 
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Builder
 import Language.Haskell.Hasynt
 import Control.Concurrent.MVar
 import Control.Concurrent ( forkIO, threadDelay )
-import Control.Monad ( when )
+import Control.Monad  ( when, forM )
+import HIndent        ( testAll )
+import HIndent.Pretty ( pretty )
+import qualified HIndent as H
 
 
 
@@ -31,6 +35,10 @@ main = do
   inputBuffer <- textViewGetBuffer textviewInput
   outputBuffer <- textViewGetBuffer textviewOutput
   mVarUpdate <- newMVar (0 :: Int)
+  radioPPChrisDone   <- builderGetObject builder castToRadioButton "radiobuttonPPChrisDone"
+  radioPPJohanTibell <- builderGetObject builder castToRadioButton "radiobuttonPPJohanTibell"
+  radioPPFundamental <- builderGetObject builder castToRadioButton "radiobuttonPPFundamental"
+  radioPPGibiansky   <- builderGetObject builder castToRadioButton "radiobuttonPPGibiansky"
 
   let
     updateOutput :: IO ()
@@ -62,10 +70,21 @@ main = do
           typeParen <- toggleButtonGetActive checkbuttonTypeParen
           valueParen <- toggleButtonGetActive checkbuttonValueParen
           braces <- toggleButtonGetActive checkbuttonBraces
-          let output = prettyPrint braces
-                     $ (if typeParen then addParensType else id)
-                     $ (if valueParen then addParensValue else id)
-                     $ m
+          let transformed = (if typeParen then addParensType else id)
+                          $ (if valueParen then addParensValue else id)
+                          $ m
+          p1 <- toggleButtonGetActive radioPPChrisDone
+          p2 <- toggleButtonGetActive radioPPJohanTibell
+          p3 <- toggleButtonGetActive radioPPFundamental
+          p4 <- toggleButtonGetActive radioPPGibiansky
+          let
+            style = if p1 then H.chrisDone
+               else if p2 then H.johanTibell
+               else if p3 then H.fundamental
+               else if p4 then H.gibiansky
+                          else H.fundamental
+          let output = prettyPrint style transformed
+          -- _ $ pretty transformed
           textBufferSetText outputBuffer output
           entrySetText entryStatus "success"
   let
@@ -79,6 +98,10 @@ main = do
   _ <- on checkbuttonTypeParen  toggled updateOutput
   _ <- on checkbuttonValueParen toggled updateOutput
   _ <- on checkbuttonBraces     toggled updateOutput
+  _ <- on radioPPChrisDone      toggled updateOutput
+  _ <- on radioPPJohanTibell    toggled updateOutput
+  _ <- on radioPPFundamental    toggled updateOutput
+  _ <- on radioPPGibiansky      toggled updateOutput
   _ <- on inputBuffer bufferChanged $ do
     s <- modifyMVar mVarUpdate (\s -> return (s+1, s+1))
     _ <- forkIO $ updateThread s
