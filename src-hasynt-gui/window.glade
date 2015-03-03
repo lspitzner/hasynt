@@ -55,7 +55,7 @@
                       <object class="GtkLabel" id="label1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">input</property>
+                        <property name="label" translatable="yes">source code</property>
                       </object>
                     </child>
                   </object>
@@ -96,7 +96,7 @@
                       <object class="GtkLabel" id="label2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">output</property>
+                        <property name="label" translatable="yes">how the compiler reads it</property>
                       </object>
                     </child>
                   </object>
